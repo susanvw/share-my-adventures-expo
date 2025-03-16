@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-export default function HomeScreen() {
+export default function MapScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
-      <Text style={[styles.title, { color: textColor }]}>Home</Text>
-      <Text style={{ color: textColor }}>Notifications and updates coming soon!</Text>
+      <Text style={[styles.title, { color: textColor }]}>Map</Text>
+      <Text style={{ color: textColor }}>Active adventure map coming soon!</Text>
     </View>
   );
 }

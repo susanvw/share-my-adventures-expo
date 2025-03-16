@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -14,35 +14,39 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].primary, // Use primary (#40d04f)
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].primary,
         tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarButton: HapticTab, // Should now type-check
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: Colors[colorScheme ?? 'light'].background,
           position: Platform.select({
-            ios: 'absolute', // Transparent background for blur on iOS
+            ios: 'absolute',
             default: 'relative',
           }),
-          borderTopColor: Colors[colorScheme ?? 'light'].icon, // Use icon color for border
+          borderTopColor: Colors[colorScheme ?? 'light'].icon,
         },
       }}
     >
+      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} /> }} />
+      <Tabs.Screen name="adventures" options={{ title: 'Adventures', tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} /> }} />
       <Tabs.Screen
-        name="index"
+        name="map"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Map',
+          tabBarIcon: ({ color }) => <IconSymbol size={36} name="map.fill" color={color} style={styles.mapIcon} />,
         }}
       />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+      <Tabs.Screen name="friends" options={{ title: 'Friends', tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.2.fill" color={color} /> }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} /> }} />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  mapIcon: {
+    borderRadius: 18,
+    padding: 4,
+  },
+});
