@@ -35,7 +35,7 @@
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>GMSApiKey</key>
-    <string>AIzaSyDPN8vAoM6kR-kUI1J5z7r5u6sM6Z4-KiM</string>
+    <string>google-key</string>
     <key>LSMinimumSystemVersion</key>
     <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
