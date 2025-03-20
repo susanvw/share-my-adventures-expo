@@ -1,15 +1,21 @@
 import ApiClient from './ApiClient';
-import { AuthenticateCommand, AuthenticateResponse } from '../types/Authenticate';
+import { AuthenticateCommand, AuthenticateResponse, AuthView } from '../types/Authenticate';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Result } from '../types/Common';
 
 class AuthenticateService {
   async authenticate(command: AuthenticateCommand): Promise<AuthenticateResponse> {
-    const response = await ApiClient.post<AuthenticateResponse>('/Authenticate/Authenticate', command);
-    if (response.succeeded && response.data) {
-      await AsyncStorage.setItem('jwtToken', response.data.jwtToken);
-      await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+    try {
+      const response = await ApiClient.post<Result<AuthView>>('/authenticate/authenticate', command);
+      if (response.succeeded && response.data) {
+        await AsyncStorage.setItem('jwtToken', response.data.jwtToken);
+        await AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+        await AsyncStorage.setItem('userId', response.data.userId);
+      }
+      return response;
+    } catch (err) {
+      return { succeeded: false, errors: ['Authentication failed'] };
     }
-    return response;
   }
 
   async logout(): Promise<void> {

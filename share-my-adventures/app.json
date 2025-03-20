@@ -10,12 +10,24 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.svwdesign.sharemyadventures"
+      "bundleIdentifier": "com.svwdesign.sharemyadventures",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDPN8vAoM6kR-kUI1J5z7r5u6sM6Z4-KiM"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Show your location on the map"
+      }
     },
     "android": {
+      "package": "com.svwdesign.sharemyadventures", 
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDPN8vAoM6kR-kUI1J5z7r5u6sM6Z4-KiM"
+        }
       }
     },
     "web": {

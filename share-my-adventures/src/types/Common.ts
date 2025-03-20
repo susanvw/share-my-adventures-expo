@@ -1,5 +1,5 @@
 export interface Result<T> {
-    data: T | null;
+    data?: T | null;
     errors: string[] | null;
     succeeded: boolean;
   }

@@ -3,8 +3,9 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
@@ -42,21 +43,46 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
+  // Check authentication status
   useEffect(() => {
-    if (loaded) {
+    const checkAuth = async () => {
+      try {
+        const token = await AsyncStorage.getItem('jwtToken');
+        setIsAuthenticated(!!token); // true if token exists, false otherwise
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setIsAuthenticated(false); // Default to unauthenticated on error
+      }
+    };
+    checkAuth();
+  }, []);
+
+  // Hide splash screen when fonts are loaded
+  useEffect(() => {
+    if (loaded && isAuthenticated !== null) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, isAuthenticated]);
 
-  if (!loaded) {
+  // Wait for fonts and auth check
+  if (!loaded || isAuthenticated === null) {
     return null;
   }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Show login screen if not authenticated, otherwise tabs */}
+        {isAuthenticated ? (
+          <Stack.Screen name="(tabs)" />
+        ) : (
+          <>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="forgot-password" />
+          </>
+        )}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
