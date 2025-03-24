@@ -1,6 +1,6 @@
 export interface Result<T> {
     data?: T | null;
-    errors: string[] | null;
+    errors?: string[] | null;
     succeeded: boolean;
   }
   

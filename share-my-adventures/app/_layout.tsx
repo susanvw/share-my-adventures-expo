@@ -1,28 +1,26 @@
 import { DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { UserProvider, useUser } from '@/src/contexts/UserContext';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Customize the navigation themes with your colors
 const CustomLightTheme = {
   ...NavigationDefaultTheme,
   colors: {
     ...NavigationDefaultTheme.colors,
-    primary: Colors.light.primary, // #40d04f
-    background: Colors.light.background, // #fff
-    text: Colors.light.text, // #11181C
-    card: Colors.light.background, // Match background
-    border: Colors.light.icon, // #687076
+    primary: Colors.light.primary,
+    background: Colors.light.background,
+    text: Colors.light.text,
+    card: Colors.light.background,
+    border: Colors.light.icon,
   },
 };
 
@@ -30,62 +28,61 @@ const CustomDarkTheme = {
   ...NavigationDarkTheme,
   colors: {
     ...NavigationDarkTheme.colors,
-    primary: Colors.dark.primary, // #40d04f
-    background: Colors.dark.background, // #151718
-    text: Colors.dark.text, // #ECEDEE
-    card: Colors.dark.background, // Match background
-    border: Colors.dark.icon, // #9BA1A6
+    primary: Colors.dark.primary,
+    background: Colors.dark.background,
+    text: Colors.dark.text,
+    card: Colors.dark.background,
+    border: Colors.dark.icon,
   },
 };
 
-export default function RootLayout() {
+function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { user } = useUser();
+  const router = useRouter();
+  const segments = useSegments();
 
-  // Check authentication status
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = await AsyncStorage.getItem('jwtToken');
-        setIsAuthenticated(!!token); // true if token exists, false otherwise
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        setIsAuthenticated(false); // Default to unauthenticated on error
-      }
-    };
-    checkAuth();
-  }, []);
-
-  // Hide splash screen when fonts are loaded
-  useEffect(() => {
-    if (loaded && isAuthenticated !== null) {
-      SplashScreen.hideAsync();
+    // Check if we're in the (tabs) group and user is not authenticated
+    if (!user && segments[0] === '(tabs)') {
+      router.replace('/login');
+    } else if (user && (segments[0] === 'login' || segments[0] === 'register' || segments[0] === 'forgot-password')) {
+      router.replace('/(tabs)');
     }
-  }, [loaded, isAuthenticated]);
-
-  // Wait for fonts and auth check
-  if (!loaded || isAuthenticated === null) {
-    return null;
-  }
+  }, [user, segments, router]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Show login screen if not authenticated, otherwise tabs */}
-        {isAuthenticated ? (
-          <Stack.Screen name="(tabs)" />
-        ) : (
-          <>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="forgot-password" />
-          </>
-        )}
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="forgot-password" />
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return (
+    <UserProvider>
+      <RootLayoutNav />
+    </UserProvider>
   );
 }
