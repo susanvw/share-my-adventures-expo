@@ -1,8 +1,9 @@
 import { Result, ProblemDetails } from './Common';
 
 export interface RegisterAccountCommand {
-  username: string;
+  email: string;
   password: string;
+  displayName?: string | null;
   callbackUrl?: string;
 }
 
@@ -12,5 +13,5 @@ export interface ConfirmEmailCommand {
 }
 
 export type RegisterAccountResponse = Result<string>;
-export type ConfirmEmailResponse = Result<void> | ProblemDetails;
-export type DeleteAccountResponse = Result<void> | ProblemDetails;
+export type ConfirmEmailResponse = void | ProblemDetails;
+export type DeleteAccountResponse = void | ProblemDetails;
