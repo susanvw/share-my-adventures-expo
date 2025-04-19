@@ -6,7 +6,7 @@ class AuthenticateService {
   async authenticate(command: AuthenticateCommand): Promise<AuthenticateResponse> {
     try {
       return await ApiClient.post<Result<AuthView>>('/authenticate/authenticate', command);
-    } catch (err) {
+    } catch  {
       // Mock fallback for localhost testing
       return new Promise((resolve) => {
         setTimeout(() => {
